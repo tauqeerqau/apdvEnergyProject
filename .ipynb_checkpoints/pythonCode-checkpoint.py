@@ -973,7 +973,7 @@
     {
      "data": {
       "text/plain": [
-       "{'_id': ObjectId('693e9768bf893f2ed87b5fb7'),\n",
+       "{'_id': ObjectId('693ec1e55cade41ce984d3d8'),\n",
        " 'country_name': 'Africa Eastern and Southern',\n",
        " 'country_code': 'ZH',\n",
        " 'year': 2022,\n",
@@ -999,120 +999,41 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Rows: 6473\n"
+      "Rows: 6338\n",
+      "                  country_name country_code  year  electricity_losses_pct\n",
+      "1  Africa Eastern and Southern          AFE  2023               24.159647\n",
+      "2  Africa Eastern and Southern          AFE  2022               12.900652\n",
+      "3  Africa Eastern and Southern          AFE  2021               12.582996\n",
+      "4  Africa Eastern and Southern          AFE  2020               12.597425\n",
+      "5  Africa Eastern and Southern          AFE  2019               11.306788\n"
      ]
-    },
-    {
-     "data": {
-      "text/html": [
-       "<div>\n",
-       "<style scoped>\n",
-       "    .dataframe tbody tr th:only-of-type {\n",
-       "        vertical-align: middle;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe tbody tr th {\n",
-       "        vertical-align: top;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe thead th {\n",
-       "        text-align: right;\n",
-       "    }\n",
-       "</style>\n",
-       "<table border=\"1\" class=\"dataframe\">\n",
-       "  <thead>\n",
-       "    <tr style=\"text-align: right;\">\n",
-       "      <th></th>\n",
-       "      <th>country_name</th>\n",
-       "      <th>country_code</th>\n",
-       "      <th>year</th>\n",
-       "      <th>electricity_use_kwh_per_capita</th>\n",
-       "    </tr>\n",
-       "  </thead>\n",
-       "  <tbody>\n",
-       "    <tr>\n",
-       "      <th>1</th>\n",
-       "      <td>Africa Eastern and Southern</td>\n",
-       "      <td>ZH</td>\n",
-       "      <td>2023</td>\n",
-       "      <td>24.159647</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>2</th>\n",
-       "      <td>Africa Eastern and Southern</td>\n",
-       "      <td>ZH</td>\n",
-       "      <td>2022</td>\n",
-       "      <td>12.900652</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>3</th>\n",
-       "      <td>Africa Eastern and Southern</td>\n",
-       "      <td>ZH</td>\n",
-       "      <td>2021</td>\n",
-       "      <td>12.582996</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>4</th>\n",
-       "      <td>Africa Eastern and Southern</td>\n",
-       "      <td>ZH</td>\n",
-       "      <td>2020</td>\n",
-       "      <td>12.597425</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>5</th>\n",
-       "      <td>Africa Eastern and Southern</td>\n",
-       "      <td>ZH</td>\n",
-       "      <td>2019</td>\n",
-       "      <td>11.306788</td>\n",
-       "    </tr>\n",
-       "  </tbody>\n",
-       "</table>\n",
-       "</div>"
-      ],
-      "text/plain": [
-       "                  country_name country_code  year  \\\n",
-       "1  Africa Eastern and Southern           ZH  2023   \n",
-       "2  Africa Eastern and Southern           ZH  2022   \n",
-       "3  Africa Eastern and Southern           ZH  2021   \n",
-       "4  Africa Eastern and Southern           ZH  2020   \n",
-       "5  Africa Eastern and Southern           ZH  2019   \n",
-       "\n",
-       "   electricity_use_kwh_per_capita  \n",
-       "1                       24.159647  \n",
-       "2                       12.900652  \n",
-       "3                       12.582996  \n",
-       "4                       12.597425  \n",
-       "5                       11.306788  "
-      ]
-     },
-     "execution_count": 20,
-     "metadata": {},
-     "output_type": "execute_result"
     }
    ],
    "source": [
-    "import requests\n",
     "import pandas as pd\n",
     "\n",
-    "url = \"https://api.worldbank.org/v2/country/all/indicator/EG.ELC.LOSS.ZS?format=json&per_page=20000\"\n",
+    "url = \"https://api.worldbank.org/v2/country/all/indicator/EG.ELC.LOSS.ZS?per_page=20000\"\n",
     "\n",
-    "response = requests.get(url)\n",
-    "data = response.json()[1]\n",
+    "# Read XML directly into DataFrame\n",
+    "df_losses_xml = pd.read_xml(url)\n",
     "\n",
-    "rows = []\n",
+    "# Keep only required columns and rename properly\n",
+    "df_losses_xml = df_losses_xml[[\n",
+    "    \"country\", \"countryiso3code\", \"date\", \"value\"\n",
+    "]].rename(columns={\n",
+    "    \"country\": \"country_name\",\n",
+    "    \"countryiso3code\": \"country_code\",\n",
+    "    \"date\": \"year\",\n",
+    "    \"value\": \"electricity_losses_pct\"\n",
+    "})\n",
     "\n",
-    "for item in data:\n",
-    "    rows.append({\n",
-    "        \"country_name\": item[\"country\"][\"value\"],\n",
-    "        \"country_code\": item[\"country\"][\"id\"],\n",
-    "        \"year\": int(item[\"date\"]),\n",
-    "        \"electricity_use_kwh_per_capita\": item[\"value\"]\n",
-    "    })\n",
+    "# Drop missing values and convert types\n",
+    "df_losses_xml = df_losses_xml.dropna()\n",
+    "df_losses_xml[\"year\"] = df_losses_xml[\"year\"].astype(int)\n",
+    "df_losses_xml[\"electricity_losses_pct\"] = df_losses_xml[\"electricity_losses_pct\"].astype(float)\n",
     "\n",
-    "df_xml_equivalent = pd.DataFrame(rows).dropna()\n",
-    "\n",
-    "print(\"Rows:\", len(df_xml_equivalent))\n",
-    "df_xml_equivalent.head()\n"
+    "print(\"Rows:\", len(df_losses_xml))\n",
+    "print(df_losses_xml.head())\n"
    ]
   },
   {
@@ -1125,17 +1046,17 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "XML-equivalent CSV written successfully\n"
+      "Electricity losses XML → CSV written successfully\n"
      ]
     }
    ],
    "source": [
-    "df_xml_equivalent.to_csv(\n",
-    "    \"electricity_use_per_capita_xml_processed.csv\",\n",
+    "df_losses_xml.to_csv(\n",
+    "    \"electricity_losses_pct_xml_processed.csv\",\n",
     "    index=False\n",
     ")\n",
     "\n",
-    "print(\"XML-equivalent CSV written successfully\")\n"
+    "print(\"Electricity losses XML → CSV written successfully\")\n"
    ]
   },
   {
@@ -1157,7 +1078,7 @@
     "\n",
     "conn = sqlite3.connect(\"electricity.db\")\n",
     "\n",
-    "df_xml_equivalent.to_sql(\n",
+    "df_losses_xml.to_sql(\n",
     "    \"electricity_losses_pct\",\n",
     "    conn,\n",
     "    if_exists=\"replace\",\n",
@@ -1202,7 +1123,7 @@
        "  <tbody>\n",
        "    <tr>\n",
        "      <th>0</th>\n",
-       "      <td>6473</td>\n",
+       "      <td>6338</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -1210,7 +1131,7 @@
       ],
       "text/plain": [
        "   total\n",
-       "0   6473"
+       "0   6338"
       ]
      },
      "execution_count": 23,
@@ -1247,7 +1168,7 @@
      "output_type": "stream",
      "text": [
       "Renewable: (7325, 3)\n",
-      "Losses: (6473, 3)\n"
+      "Losses: (6338, 3)\n"
      ]
     }
    ],
@@ -1277,7 +1198,7 @@
     "    SELECT\n",
     "        country_code,\n",
     "        year,\n",
-    "        electricity_use_kwh_per_capita AS electricity_losses_pct\n",
+    "        electricity_losses_pct\n",
     "    FROM electricity_losses_pct\n",
     "    \"\"\",\n",
     "    sqlite_conn\n",
@@ -2007,6 +1928,22 @@
    "cell_type": "code",
    "execution_count": null,
    "id": "62930fa8-d48a-464a-b571-d9af45f58a0c",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "991c4372-8e24-4e48-86b7-d84e4441f1f6",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c043c0b9-585d-48ce-8f0a-e53f7567d1a9",
    "metadata": {},
    "outputs": [],
    "source": []
