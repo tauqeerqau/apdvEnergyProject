@@ -29,7 +29,7 @@ st.sidebar.header("Filters")
 
 country = st.sidebar.selectbox(
     "Select Country",
-    sorted(df["country_code"].unique())
+    sorted(df["country_name"].unique())
 )
 
 year_range = st.sidebar.slider(
@@ -43,7 +43,7 @@ year_range = st.sidebar.slider(
 # Apply Filters
 # ---------------------------------------------------
 filtered_df = df[
-    (df["country_code"] == country) &
+    (df["country_name"] == country) &
     (df["year"] >= year_range[0]) &
     (df["year"] <= year_range[1])
 ]
@@ -110,13 +110,16 @@ if len(filtered_df) > 1:
     base = chart_df.iloc[0]
 
     chart_df["Electricity Use Index"] = (
-        chart_df["electricity_use_kwh_per_capita"] / base["electricity_use_kwh_per_capita"] * 100
+        chart_df["electricity_use_kwh_per_capita"]
+        / base["electricity_use_kwh_per_capita"] * 100
     )
     chart_df["Renewable Index"] = (
-        chart_df["renewable_electricity_percent"] / base["renewable_electricity_percent"] * 100
+        chart_df["renewable_electricity_percent"]
+        / base["renewable_electricity_percent"] * 100
     )
     chart_df["Losses Index"] = (
-        chart_df["electricity_losses_pct"] / base["electricity_losses_pct"] * 100
+        chart_df["electricity_losses_pct"]
+        / base["electricity_losses_pct"] * 100
     )
 
     melted = chart_df.melt(
@@ -155,9 +158,9 @@ map_df = df[df["year"] == map_year]
 
 fig_map = px.choropleth(
     map_df,
-    locations="country_code",
+    locations="country_code",          # ISO-3 REQUIRED
     color="electricity_use_kwh_per_capita",
-    hover_name="country_code",
+    hover_name="country_name",          # HUMAN READABLE
     color_continuous_scale="YlOrRd",
     projection="natural earth",
     title=f"Electricity Use per Capita ({map_year})"
@@ -177,7 +180,7 @@ top5 = (
 
 fig_top5 = px.bar(
     top5,
-    x="country_code",
+    x="country_name",
     y="electricity_use_kwh_per_capita",
     text="electricity_use_kwh_per_capita",
     labels={"electricity_use_kwh_per_capita": "kWh per Capita"},
@@ -189,4 +192,16 @@ st.plotly_chart(fig_top5, use_container_width=True)
 # Data Table
 # ---------------------------------------------------
 st.subheader(f"Data for {country}")
-st.dataframe(filtered_df)
+
+st.dataframe(
+    filtered_df[
+        [
+            "country_name",
+            "country_code",
+            "year",
+            "electricity_use_kwh_per_capita",
+            "renewable_electricity_percent",
+            "electricity_losses_pct"
+        ]
+    ]
+)
