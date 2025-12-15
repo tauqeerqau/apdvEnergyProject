@@ -96,7 +96,9 @@ The automated pipeline performs the following steps:
 The pipeline is implemented using **Prefect**, ensuring reproducibility and modular task execution.
 
 ---
-
+## 🌐 Deployed Dashboard URL 
+    https://apdvenergyproject-cmfz9usomwdrlbb9uc2rdu.streamlit.app/
+---
 ## 📈 Interactive Dashboard
 
 The Streamlit dashboard enables users to:
