@@ -126,14 +126,21 @@ def process_xml_to_sqlite():
     print("\n[STEP 8] Fetching XML API data")
     df_xml = pd.read_xml(XML_URL)
 
-    df_xml = df_xml[[
-        "country", "countryiso3code", "date", "value"
-    ]].rename(columns={
+    
+    df_losses_xml = df_losses_xml.rename(columns={
         "country": "country_name",
         "countryiso3code": "country_code",
         "date": "year",
         "value": "electricity_losses_pct"
     })
+
+
+    df_losses_xml = df_losses_xml[[
+        "country_name",
+        "country_code",
+        "year",
+        "electricity_losses_pct"
+    ]]
 
     print("Raw XML DF:", df_xml.shape)
 
