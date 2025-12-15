@@ -127,7 +127,7 @@ def process_xml_to_sqlite():
     df_xml = pd.read_xml(XML_URL)
 
     
-    df_losses_xml = df_losses_xml.rename(columns={
+    df_xml = df_xml.rename(columns={
         "country": "country_name",
         "countryiso3code": "country_code",
         "date": "year",
@@ -135,7 +135,7 @@ def process_xml_to_sqlite():
     })
 
 
-    df_losses_xml = df_losses_xml[[
+    df_xml = df_xml[[
         "country_name",
         "country_code",
         "year",
