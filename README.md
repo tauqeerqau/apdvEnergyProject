@@ -121,10 +121,13 @@ The Streamlit dashboard enables users to:
 ### 1️⃣ Install Dependencies
 pip install -r requirements.txt
 
-### 2️⃣ Run the Data Pipeline
+### 2️⃣ Please keep file in your folder
+world_countries.geojson
+
+### 3️⃣ Run the Data Pipeline
 python pipeline.py
 
-### 3️⃣ Run the Dashboard
+### 4️⃣ Run the Dashboard
 streamlit run dashboard.py
 
 ### 👥 Team Members & Contributions
