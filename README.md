@@ -97,7 +97,7 @@ The pipeline is implemented using **Prefect**, ensuring reproducibility and modu
 
 ---
 ## 🌐 Deployed Dashboard URL 
-    https://apdvenergyproject-cmfz9usomwdrlbb9uc2rdu.streamlit.app/
+    https://apdvenergyproject-jaokeqwr3txvnbxc8r8suc.streamlit.app/
 ---
 ## 💻 Github Source Code Github Repository URL
     https://github.com/tauqeerqau/apdvEnergyProject
